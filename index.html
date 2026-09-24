@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Deadline Radar helps you track deadlines, reminders, and study tasks with a clean glassmorphism dashboard." />
+    <title>Deadline Radar</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="page-glow glow-one"></div>
+    <div class="page-glow glow-two"></div>
+
+    <div id="app">
+      <header class="topbar glass-panel">
+        <div>
+            <p class="eyebrow">Academic command center</p>
+          <h1>Deadline Radar</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="status-pill">Guest mode</span>
+          <button id="theme-toggle" class="ghost-button" type="button" aria-label="Toggle theme"><span class="button-icon" aria-hidden="true">◐</span><span class="button-label">Dark</span></button>
+        </div>
+      </header>
+
+      <main id="dashboard-screen" class="app-shell">
+        <section class="profile-layout">
+          <div class="glass-panel profile-panel">
+            <div class="profile-header">
+              <div class="avatar">👤</div>
+              <div>
+                <p class="profile-kicker">Profile</p>
+                <h3 id="profile-name">Guest User</h3>
+                <p id="profile-email">guest@deadline-radar.local</p>
+              </div>
+            </div>
+
+            <div class="profile-stats">
+              <div>
+                <strong id="profile-total">0</strong>
+                <span>Tasks</span>
+              </div>
+              <div>
+                <strong id="profile-pending">0</strong>
+                <span>Pending</span>
+              </div>
+            </div>
+
+            <button id="open-profile-modal" class="secondary-button" type="button"><span class="button-icon" aria-hidden="true">✎</span><span class="button-label">Edit profile</span></button>
+          </div>
+        </section>
+
+        <section class="summary-grid" aria-label="deadline summary">
+          <article class="summary-card glass-panel red">
+            <p>Pending</p>
+            <h2 id="pending-count">0</h2>
+          </article>
+          <article class="summary-card glass-panel orange">
+            <p>Urgent</p>
+            <h2 id="urgent-count">0</h2>
+          </article>
+          <article class="summary-card glass-panel yellow">
+            <p>Completed</p>
+            <h2 id="completed-count">0</h2>
+          </article>
+          <article class="summary-card glass-panel green">
+            <p>Total</p>
+            <h2 id="total-count">0</h2>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <aside class="glass-panel form-panel">
+            <h2>Add New Deadline</h2>
+            <form id="deadline-form">
+              <div class="field-group">
+                <label for="title">Task title</label>
+                <input id="title" name="title" type="text" placeholder="E.g. AI assignment" required />
+              </div>
+
+              <div class="field-group">
+                <label for="course">Course / subject</label>
+                <input id="course" name="course" type="text" placeholder="E.g. Data Structures" />
+              </div>
+
+              <div class="field-group">
+                <label for="due_date">Due date</label>
+                <input id="due_date" name="due_date" type="date" required />
+              </div>
+
+              <div class="field-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                  <option value="High">High</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label for="reminder_email">Reminder email</label>
+                <input id="reminder_email" name="reminder_email" type="email" placeholder="Reminder target email" />
+              </div>
+
+              <div class="field-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Add details or requirements..."></textarea>
+              </div>
+
+              <button class="primary-button" type="submit">Add Deadline</button>
+            </form>
+          </aside>
+
+          <section class="glass-panel list-panel">
+            <div class="list-header">
+              <h2>Upcoming Deadlines</h2>
+              <div class="header-actions">
+                <button id="export-csv" class="secondary-button compact-button" type="button"><span class="button-icon" aria-hidden="true">↓</span><span class="button-label">CSV</span></button>
+                <button id="export-pdf" class="secondary-button compact-button" type="button"><span class="button-icon" aria-hidden="true">▤</span><span class="button-label">PDF</span></button>
+                <button id="refresh-btn" class="secondary-button compact-button" type="button"><span class="button-icon" aria-hidden="true">↻</span><span class="button-label">Refresh</span></button>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <div class="filters" aria-label="deadline filters">
+                <button class="filter-button active" type="button" data-filter="all">All</button>
+                <button class="filter-button" type="button" data-filter="pending">Pending</button>
+                <button class="filter-button" type="button" data-filter="completed">Completed</button>
+              </div>
+
+              <div class="search-group">
+                <input id="search-input" type="search" placeholder="Search tasks, courses, notes" />
+                <select id="sort-select">
+                  <option value="due_date_asc">Due date ↑</option>
+                  <option value="due_date_desc">Due date ↓</option>
+                  <option value="priority_desc">Priority High</option>
+                  <option value="priority_asc">Priority Low</option>
+                  <option value="created_at_desc">Newest</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="reminders-box">
+              <h3>Reminder list</h3>
+              <div id="reminder-list" class="reminder-list"></div>
+            </div>
+
+            <div id="deadline-list" class="deadline-list" aria-live="polite"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <footer class="footer">Deadline Radar © 2026 • Created by Dineshraj K C</footer>
+
+    <div id="edit-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Task</h3>
+          <button type="button" class="close-modal" data-close="edit-modal" aria-label="Close edit task">✕</button>
+        </div>
+        <form id="edit-deadline-form">
+          <input type="hidden" id="edit-deadline-id" />
+          <div class="field-group">
+            <label for="edit-title">Task title</label>
+            <input id="edit-title" name="title" type="text" required />
+          </div>
+          <div class="field-group">
+            <label for="edit-course">Course</label>
+            <input id="edit-course" name="course" type="text" />
+          </div>
+          <div class="field-group">
+            <label for="edit-due_date">Due date</label>
+            <input id="edit-due_date" name="due_date" type="date" required />
+          </div>
+          <div class="field-group">
+            <label for="edit-priority">Priority</label>
+            <select id="edit-priority" name="priority">
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="edit-reminder_email">Reminder email</label>
+            <input id="edit-reminder_email" name="reminder_email" type="email" />
+          </div>
+          <div class="field-group">
+            <label for="edit-notes">Notes</label>
+            <textarea id="edit-notes" name="notes"></textarea>
+          </div>
+          <button class="primary-button" type="submit">Save changes</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="profile-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-content small">
+        <div class="modal-header">
+          <h3>Edit Profile</h3>
+          <button type="button" class="close-modal" data-close="profile-modal" aria-label="Close edit profile">✕</button>
+        </div>
+        <form id="profile-form">
+          <div class="field-group">
+            <label for="profile-name-input">Name</label>
+            <input id="profile-name-input" name="name" type="text" required />
+          </div>
+          <div class="field-group">
+            <label for="profile-email-input">Email</label>
+            <input id="profile-email-input" name="email" type="email" required />
+          </div>
+          <div class="field-group">
+            <label for="profile-password-input">New password (optional)</label>
+            <input id="profile-password-input" name="password" type="password" placeholder="Leave blank to keep current password" />
+          </div>
+          <button class="primary-button" type="submit">Update profile</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>
+
