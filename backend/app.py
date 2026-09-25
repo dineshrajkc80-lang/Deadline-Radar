@@ -9,8 +9,28 @@ from flask import Flask, jsonify, request, send_file, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_DIR = os.path.join(BASE_DIR, "database")
-DB_PATH = os.path.join(DB_DIR, "deadline_radar.db")
+
+
+def load_local_env():
+    env_path = os.path.join(BASE_DIR, ".env")
+    if not os.path.exists(env_path):
+        return
+
+    with open(env_path, encoding="utf-8") as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+
+
+load_local_env()
+
+LOCAL_DB_PATH = os.path.join(BASE_DIR, "database", "deadline_radar.db")
+VERCEL_DB_PATH = os.path.join("/tmp", "deadline_radar.db")
+DB_PATH = os.environ.get("DATABASE_PATH") or (VERCEL_DB_PATH if os.environ.get("VERCEL") else LOCAL_DB_PATH)
+DB_DIR = os.path.dirname(DB_PATH)
 GUEST_NAME = "Guest User"
 GUEST_EMAIL = "guest@deadline-radar.local"
 
@@ -20,7 +40,7 @@ app.config.update(
     SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_SECURE=bool(os.environ.get("VERCEL")),
     MAX_CONTENT_LENGTH=4 * 1024 * 1024,
 )
 

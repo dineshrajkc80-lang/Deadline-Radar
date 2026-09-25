@@ -33,6 +33,9 @@ Created by Dineshraj K C.
 4. Open the browser at:
    http://127.0.0.1:5000
 
+For local secrets, copy `.env.example` to `.env` and set `SECRET_KEY`. The
+`.env` file is ignored by Git and must never be committed.
+
 ## Security notes
 
 - Default app secret is generated securely from the environment or a runtime token.
@@ -45,6 +48,20 @@ Created by Dineshraj K C.
 Run:
 
 python -m pytest tests/test_backend.py
+
+## Deploy to Vercel
+
+The repository includes `pyproject.toml` with the Flask entrypoint:
+
+   backend.app:app
+
+Import the repository in Vercel and deploy from the project root. Set a strong
+`SECRET_KEY` environment variable in Vercel before production use.
+
+SQLite works for local development. Vercel serverless functions use temporary
+`/tmp` storage, so database changes are not durable across all deployments or
+cold starts. Use a hosted database such as Turso, Neon Postgres, or another
+managed SQLite-compatible service when persistent production data is required.
 
 ## License
 
